@@ -1,5 +1,5 @@
 const materias = [
-  // Año 1
+  // Primer Año 
   { id: 1, name: "Plástica y Visión I", year: 1, correlativas: [] },
   { id: 2, name: "Tecnología digital I", year: 1, correlativas: [] },
   { id: 3, name: "Historia del arte y el diseño I", year: 1, correlativas: [] },
@@ -10,7 +10,7 @@ const materias = [
   { id: 8, name: "Audiovisión I", year: 1, correlativas: [] },
   { id: 9, name: "Tipografía I", year: 1, correlativas: [] },
 
-  // Año 2
+  // Segundo Año 
   { id: 10, name: "Plástica y Visión II", year: 2, correlativas: [1] },
   { id: 11, name: "Tecnología digital II", year: 2, correlativas: [2] },
   { id: 12, name: "Historia del arte y el diseño II", year: 2, correlativas: [3] },
@@ -22,7 +22,7 @@ const materias = [
   { id: 18, name: "Imagen y composición digital I", year: 2, correlativas: [] },
   { id: 19, name: "Diseño multimedial I", year: 2, correlativas: [] },
 
-  // Año 3
+  // Tercer Año 
   { id: 20, name: "Programación audiovisual I", year: 3, correlativas: [] },
   { id: 21, name: "Diseño 3D I", year: 3, correlativas: [] },
   { id: 22, name: "Animación y edición multimedial I", year: 3, correlativas: [] },
@@ -33,7 +33,7 @@ const materias = [
   { id: 27, name: "Imagen y composición digital II", year: 3, correlativas: [18] },
   { id: 28, name: "Ética", year: 3, correlativas: [] },
 
-  // Año 4
+  // Cuarto Año
   { id: 29, name: "Programación audiovisual II", year: 4, correlativas: [20] },
   { id: 30, name: "Diseño 3D II", year: 4, correlativas: [21] },
   { id: 31, name: "Animación y edición multimedial II", year: 4, correlativas: [22] },
@@ -45,68 +45,64 @@ const materias = [
   { id: 37, name: "Seminario de integración-trabajo final", year: 4, correlativas: [23, 32, 36] }
 ];
 
-// Traemos el progreso guardado o un objeto vacío
 let progreso = JSON.parse(localStorage.getItem("progresoMaterias")) || {};
 
 const contenedor = document.getElementById("materias");
 
-const materiasPorAño = {};
+function estaDesbloqueada(materia) {
+  if (materia.correlativas.length === 0) return true;
+  return materia.correlativas.every((id) => progreso[id]);
+}
 
-materias.forEach((materia) => {
-  if (!materiasPorAño[materia.year]) {
-    materiasPorAño[materia.year] = [];
-  }
-  materiasPorAño[materia.year].push(materia);
-});
+function renderizarMaterias() {
+  contenedor.innerHTML = "";
 
-// Limpia contenedor por si recarga
-contenedor.innerHTML = "";
-
-// Renderiza por año
-for (let año in materiasPorAño) {
-  const añoDiv = document.createElement("div");
-  añoDiv.className = "año";
-  añoDiv.innerHTML = `<h2>Año ${año}</h2>`;
-
-  materiasPorAño[año].forEach((materia) => {
-    const div = document.createElement("div");
-    div.className = "materia";
-
-    // Si está marcado como hecho, agregamos clase 'hecho'
-    if (progreso[materia.id]) {
-      div.classList.add("hecho");
-    }
-
-    div.innerHTML = `
-      <span>${materia.name}</span>
-      <button class="toggle-btn">${progreso[materia.id] ? "✓ Hecho" : "Marcar"}</button>
-    `;
-
-    // Mostrar correlativas debajo
-    if (materia.correlativas.length > 0) {
-      const correlativas = materia.correlativas
-        .map((id) => materias.find((m) => m.id === id).name)
-        .join(", ");
-      const corr = document.createElement("p");
-      corr.className = "correlativas";
-      corr.textContent = `Correlativas: ${correlativas}`;
-      div.appendChild(corr);
-    }
-
-    // Botón para marcar como hecho/no hecho
-    const btn = div.querySelector(".toggle-btn");
-    btn.addEventListener("click", () => {
-      if (progreso[materia.id]) {
-        delete progreso[materia.id];
-      } else {
-        progreso[materia.id] = true;
-      }
-      localStorage.setItem("progresoMaterias", JSON.stringify(progreso));
-      location.reload(); // Recarga para actualizar la vista
-    });
-
-    añoDiv.appendChild(div);
+  // Agrupar materias por año
+  const materiasPorAño = {};
+  materias.forEach((m) => {
+    if (!materiasPorAño[m.year]) materiasPorAño[m.year] = [];
+    materiasPorAño[m.year].push(m);
   });
 
-  contenedor.appendChild(añoDiv);
+  for (let año in materiasPorAño) {
+    const añoDiv = document.createElement("div");
+    añoDiv.className = "año";
+    añoDiv.innerHTML = `<h2>Año ${año}</h2>`;
+
+    materiasPorAño[año].forEach((materia) => {
+      const div = document.createElement("div");
+      div.className = "materia";
+
+      // Marcar si ya está hecha
+      if (progreso[materia.id]) div.classList.add("hecho");
+
+      // Ver si está desbloqueada
+      const desbloqueada = estaDesbloqueada(materia);
+      if (!desbloqueada) div.classList.add("bloqueada");
+
+      div.innerHTML = `
+        <span>${materia.name}</span>
+        <button class="toggle-btn" ${!desbloqueada ? "disabled" : ""}>
+          ${progreso[materia.id] ? "✓ Hecho" : "Marcar"}
+        </button>
+      `;
+
+      const btn = div.querySelector(".toggle-btn");
+      btn.addEventListener("click", () => {
+        if (progreso[materia.id]) {
+          delete progreso[materia.id];
+        } else {
+          progreso[materia.id] = true;
+        }
+        localStorage.setItem("progresoMaterias", JSON.stringify(progreso));
+        renderizarMaterias();
+      });
+
+      añoDiv.appendChild(div);
+    });
+
+    contenedor.appendChild(añoDiv);
+  }
 }
+
+renderizarMaterias();
