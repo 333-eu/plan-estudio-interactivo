@@ -45,29 +45,6 @@ const materias = [
   { id: 37, name: "Seminario de integración-trabajo final", year: 4, correlativas: [23, 32, 36] }
 ];
 
-let progress = JSON.parse(localStorage.getItem("studyProgress")) || {};
-
-const container = document.getElementById("study-plan");
-
-topics.forEach(topic => {
-  const card = document.createElement("div");
-  card.className = "card";
-  if (progress[topic.id]) card.classList.add("done");
-
-  card.innerHTML = `
-    <h3>${topic.name}</h3>
-    <button>${progress[topic.id] ? "Completado ✅" : "Marcar como hecho"}</button>
-  `;
-
-  const button = card.querySelector("button");
-  button.addEventListener("click", () => {
-    progress[topic.id] = !progress[topic.id];
-    localStorage.setItem("studyProgress", JSON.stringify(progress));
-    location.reload();
-  });
-
-  container.appendChild(card);
-});
 const contenedor = document.getElementById("materias");
 
 const materiasPorAño = {};
