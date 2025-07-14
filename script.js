@@ -68,3 +68,41 @@ topics.forEach(topic => {
 
   container.appendChild(card);
 });
+const contenedor = document.getElementById("materias");
+
+const materiasPorAño = {};
+
+materias.forEach((materia) => {
+  if (!materiasPorAño[materia.year]) {
+    materiasPorAño[materia.year] = [];
+  }
+  materiasPorAño[materia.year].push(materia);
+});
+
+// Renderiza por año
+for (let año in materiasPorAño) {
+  const añoDiv = document.createElement("div");
+  añoDiv.className = "año";
+  añoDiv.innerHTML = `<h2>Año ${año}</h2>`;
+
+  materiasPorAño[año].forEach((materia) => {
+    const div = document.createElement("div");
+    div.className = "materia";
+    div.innerHTML = `<strong>${materia.name}</strong>`;
+
+    // Mostrar correlativas
+    if (materia.correlativas.length > 0) {
+      const correlativas = materia.correlativas
+        .map((id) => materias.find((m) => m.id === id).name)
+        .join(", ");
+      const corr = document.createElement("p");
+      corr.className = "correlativas";
+      corr.textContent = `Correlativas: ${correlativas}`;
+      div.appendChild(corr);
+    }
+
+    añoDiv.appendChild(div);
+  });
+
+  contenedor.appendChild(añoDiv);
+}
