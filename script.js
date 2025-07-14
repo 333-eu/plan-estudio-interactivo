@@ -56,7 +56,6 @@ materias.forEach((materia) => {
   materiasPorAño[materia.year].push(materia);
 });
 
-// Renderiza por año
 for (let año in materiasPorAño) {
   const añoDiv = document.createElement("div");
   añoDiv.className = "año";
@@ -67,7 +66,6 @@ for (let año in materiasPorAño) {
     div.className = "materia";
     div.innerHTML = `<strong>${materia.name}</strong>`;
 
-    // Mostrar correlativas
     if (materia.correlativas.length > 0) {
       const correlativas = materia.correlativas
         .map((id) => materias.find((m) => m.id === id).name)
