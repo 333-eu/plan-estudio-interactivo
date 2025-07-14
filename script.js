@@ -45,6 +45,9 @@ const materias = [
   { id: 37, name: "Seminario de integración-trabajo final", year: 4, correlativas: [23, 32, 36] }
 ];
 
+// Traemos el progreso guardado o un objeto vacío
+let progreso = JSON.parse(localStorage.getItem("progresoMaterias")) || {};
+
 const contenedor = document.getElementById("materias");
 
 const materiasPorAño = {};
@@ -56,6 +59,10 @@ materias.forEach((materia) => {
   materiasPorAño[materia.year].push(materia);
 });
 
+// Limpia contenedor por si recarga
+contenedor.innerHTML = "";
+
+// Renderiza por año
 for (let año in materiasPorAño) {
   const añoDiv = document.createElement("div");
   añoDiv.className = "año";
@@ -64,8 +71,18 @@ for (let año in materiasPorAño) {
   materiasPorAño[año].forEach((materia) => {
     const div = document.createElement("div");
     div.className = "materia";
-    div.innerHTML = `<strong>${materia.name}</strong>`;
 
+    // Si está marcado como hecho, agregamos clase 'hecho'
+    if (progreso[materia.id]) {
+      div.classList.add("hecho");
+    }
+
+    div.innerHTML = `
+      <span>${materia.name}</span>
+      <button class="toggle-btn">${progreso[materia.id] ? "✓ Hecho" : "Marcar"}</button>
+    `;
+
+    // Mostrar correlativas debajo
     if (materia.correlativas.length > 0) {
       const correlativas = materia.correlativas
         .map((id) => materias.find((m) => m.id === id).name)
@@ -75,6 +92,18 @@ for (let año in materiasPorAño) {
       corr.textContent = `Correlativas: ${correlativas}`;
       div.appendChild(corr);
     }
+
+    // Botón para marcar como hecho/no hecho
+    const btn = div.querySelector(".toggle-btn");
+    btn.addEventListener("click", () => {
+      if (progreso[materia.id]) {
+        delete progreso[materia.id];
+      } else {
+        progreso[materia.id] = true;
+      }
+      localStorage.setItem("progresoMaterias", JSON.stringify(progreso));
+      location.reload(); // Recarga para actualizar la vista
+    });
 
     añoDiv.appendChild(div);
   });
