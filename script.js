@@ -1,5 +1,5 @@
 const materias = [
-  // Primer Año 
+  // Primer Año
   { id: 1, name: "Plástica y Visión I", year: 1, correlativas: [] },
   { id: 2, name: "Tecnología digital I", year: 1, correlativas: [] },
   { id: 3, name: "Historia del arte y el diseño I", year: 1, correlativas: [] },
@@ -10,7 +10,7 @@ const materias = [
   { id: 8, name: "Audiovisión I", year: 1, correlativas: [] },
   { id: 9, name: "Tipografía I", year: 1, correlativas: [] },
 
-  // Segundo Año 
+  // Segundo Año
   { id: 10, name: "Plástica y Visión II", year: 2, correlativas: [1] },
   { id: 11, name: "Tecnología digital II", year: 2, correlativas: [2] },
   { id: 12, name: "Historia del arte y el diseño II", year: 2, correlativas: [3] },
